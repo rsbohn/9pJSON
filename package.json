@@ -11,6 +11,9 @@
   "license": "BSD",
   "gitHead": "acfd22deccaa64c758a78ebf718c851ddc45da00",
   "devDependencies": {
-    "grunt": "~0.4.1"
+    "grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.6.3",
+    "grunt-contrib-nodeunit": "~0.2.1",
+    "grunt-contrib-watch": "~0.2.1"
   }
 }
