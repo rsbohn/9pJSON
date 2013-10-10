@@ -1,0 +1,16 @@
+{
+  "name": "ixp",
+  "version": "0.0.0",
+  "description": "The 9p protocol.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node ixp_test.js"
+  },
+  "repository": "",
+  "author": "Randall Bohn",
+  "license": "BSD",
+  "gitHead": "acfd22deccaa64c758a78ebf718c851ddc45da00",
+  "devDependencies": {
+    "grunt": "~0.4.1"
+  }
+}
