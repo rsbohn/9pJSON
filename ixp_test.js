@@ -47,20 +47,26 @@ ixp.Service.answer({type:ixp.Tattach, tag: 2000, fid: 1812});
 console.log("should fail second Tattach with same fid");
 ixp.Service.answer({type:ixp.Tattach, tag: 2000, fid: 1812});
 
+var fmt_dirent = [
+"i2:size", "i2:type", "i4:dev", "b13:qid", 
+"i4:mode", "i4:atime", "i4:mtime", "i8:length", 
+"S2:name", "S2:uid", "S2:gid", "S2:muid"
+];
+var util = require('./ixputil');
+
 ixp.Service.send9p = function(p){return JSON.stringify(p);};
 exports.Tread = function(test) {
-  test.equals(
-      ixp.Service.answer({type:ixp.Tread, tag: 2001, fid:1812, offset: 0}),
-      //this shold be a dirent reply, need to decode it
-      '{"type":"117","tag":2001,"data":"You may find yourself in another part of the world."}',
-      "Tread fail"); 
+  var fixture =  JSON.parse(ixp.Service.answer({type:ixp.Tread, tag: 2001, fid:1812, offset: 0}));
+  test.equals(fixture.type, 117);
+  test.equals(fixture.tag, 2001);
+  var dent = util.unpack(fixture.data, fmt_dirent);
+  console.log(dent);
+  test.equals(dent.name, "a"); 
+  test.equals(dent.mode & 0777, 0111, "gumshoe");
   test.done();
 };
 
-var fmt_dirent = [
-"i2:size", "i2:type", "i4:dev", "b13:qid", "i4:mode", "i4:atime", "i4:mtime", "i8:length", "S2:name", "S2:uid", "S2:gid", "S2:muid"
-];
-var util = require('./ixputil');
+
 exports.dirent = function(test) {
   var fixture = util.unpack(ixp.dirent(root), fmt_dirent);
   test.equals(fixture.type, "0", "dirent type fail");

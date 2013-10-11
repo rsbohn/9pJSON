@@ -112,7 +112,7 @@ exports.dirent = function(f){
   var now = new Date().getTime() / 1000;
   var s = { type: 0, dev: 0, qid: pack(f.qid, Qid), mode: 0, atime: now, mtime: now, length: 0, 
     name: f.name, uid: "js", gid: "js", muid: "js"};
-  if(f.qid.type & QTDIR) { s.mode |= 0x80000111; }
+  if(f.qid.type & QTDIR) { s.mode |= 0111; s.mode += 0x80000000; }
   var packed = pack(s, fmt);
   var size = pack({ a:packed.length },["i2:a"]);
   return size + packed;
