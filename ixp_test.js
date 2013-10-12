@@ -6,6 +6,7 @@ var root = ixp.mkroot();
 root.mkdir("/a").mkdir("b");
 root.mkdir("/a/a").mkdir("b");
 root.mkdir("/a/nother");
+root.mkdir("/cows");
 
 //lookup should return a directory
 unit.testcase(ixp.isDir(root.lookup("/a/a/b", false)));
@@ -58,7 +59,7 @@ var tag = 2001;
 ixp.Service.send9p = function(p){return p;};
 exports.Tread = function(test) {
   var offset = 0;
-  var fixture =  ixp.Service.answer({type:ixp.Tread, tag:tag++, fid:1812, offset:offset, count:128});
+  var fixture =  ixp.Service.answer({type:ixp.Tread, tag:tag, fid:1812, offset:offset, count:128});
   console.log("\n"+JSON.stringify(fixture));
   test.equals(fixture.type, 117);
   test.equals(fixture.tag, 2001);
@@ -69,10 +70,15 @@ exports.Tread = function(test) {
   test.equals(dent.mode & 0777, 0111);
   test.equals(dent.mode >>> 24, 0x80); //DMDIR >>> 24 (to avoid sign extension)
 
-  fixture = ixp.Service.answer({type:ixp.Tread, tag:tag++, fid:1812, offset:offset, count:128});
+  tag++;
+  fixture = ixp.Service.answer({type:ixp.Tread, tag:tag, fid:1812, offset:offset, count:128});
   console.log(fixture);
   test.equals(fixture.type, ixp.Rread);
-  test.equals(fixture.tag, 2002);
+  test.equals(fixture.tag, tag);
+  offset += fixture.data.length;
+  fixture = ixp.Service.answer({type:ixp.Tread, tag:tag, fid:1812, offset:offset, count:128});
+  console.log(fixture);
+  test.equals(fixture.tag, tag);
   test.done();
 };
 

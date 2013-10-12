@@ -85,6 +85,7 @@ module.exports.Service = {
 };
 
 var read_dirent = function(service, packet, f) {
+  //sends one dirent at a time, provided packet.offset===f.bloc and the dirent fits into packet.count
   var reply = {type:msgtype.Rread, tag:packet.tag};
   console.log(packet);
   if (packet.offset === 0) f.bloc = f.nloc = 0;
