@@ -54,31 +54,48 @@ var fmt_dirent = [
 "S2:name", "S2:uid", "S2:gid", "S2:muid"
 ];
 var util = require('./ixputil');
-var tag = 2001;
+var verbose = false;
 
 ixp.Service.send9p = function(p){return p;};
 exports.Tread = function(test) {
-  var offset = 0;
-  var fixture =  ixp.Service.answer({type:ixp.Tread, tag:tag, fid:1812, offset:offset, count:128});
-  console.log("\n"+JSON.stringify(fixture));
+  verbose = false;
+  if (verbose) { console.log(); }
+
+  var request = {type:ixp.Tread, tag:2001, fid:1812, count:128, offset:0};
+  var fixture =  ixp.Service.answer(request);
+  if (verbose) { console.log("\n"+JSON.stringify(fixture));}
   test.equals(fixture.type, 117);
   test.equals(fixture.tag, 2001);
-  offset += fixture.data.length;
   var dent = util.unpack(fixture.data, fmt_dirent);
-  console.log(dent);
+  if (verbose) { console.log(dent);}
   test.equals(dent.name, "a"); 
   test.equals(dent.mode & 0777, 0111);
   test.equals(dent.mode >>> 24, 0x80); //DMDIR >>> 24 (to avoid sign extension)
 
-  tag++;
-  fixture = ixp.Service.answer({type:ixp.Tread, tag:tag, fid:1812, offset:offset, count:128});
-  console.log(fixture);
+  request.offset += fixture.data.length;
+  request.tag++;
+  fixture = ixp.Service.answer(request);
+  if (verbose) { console.log(fixture);}
   test.equals(fixture.type, ixp.Rread);
-  test.equals(fixture.tag, tag);
-  offset += fixture.data.length;
-  fixture = ixp.Service.answer({type:ixp.Tread, tag:tag, fid:1812, offset:offset, count:128});
-  console.log(fixture);
-  test.equals(fixture.tag, tag);
+  test.equals(fixture.tag, request.tag);
+  dent = util.unpack(fixture.data, fmt_dirent);
+  test.equals(dent.name, 'cows');
+
+  //at the end
+  request.offset += fixture.data.length;
+  fixture = ixp.Service.answer(request);
+  if (verbose) { console.log(fixture);}
+  test.equals(fixture.tag, request.tag);
+  test.equals(fixture.data, '');
+
+  //we're at the end+1, can we still read?
+  //no need to update request.offset
+  request.tag++;
+  fixture = ixp.Service.answer(request);
+  if (verbose) { console.log(fixture);}
+  test.equals(fixture.tag, request.tag);
+  test.equals(fixture.data, '');
+  
   test.done();
 };
 
