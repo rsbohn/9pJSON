@@ -53,16 +53,26 @@ var fmt_dirent = [
 "S2:name", "S2:uid", "S2:gid", "S2:muid"
 ];
 var util = require('./ixputil');
+var tag = 2001;
 
-ixp.Service.send9p = function(p){return JSON.stringify(p);};
+ixp.Service.send9p = function(p){return p;};
 exports.Tread = function(test) {
-  var fixture =  JSON.parse(ixp.Service.answer({type:ixp.Tread, tag: 2001, fid:1812, offset: 0}));
+  var offset = 0;
+  var fixture =  ixp.Service.answer({type:ixp.Tread, tag:tag++, fid:1812, offset:offset, count:128});
+  console.log("\n"+JSON.stringify(fixture));
   test.equals(fixture.type, 117);
   test.equals(fixture.tag, 2001);
+  offset += fixture.data.length;
   var dent = util.unpack(fixture.data, fmt_dirent);
   console.log(dent);
   test.equals(dent.name, "a"); 
-  test.equals(dent.mode & 0777, 0111, "gumshoe");
+  test.equals(dent.mode & 0777, 0111);
+  test.equals(dent.mode >>> 24, 0x80); //DMDIR >>> 24 (to avoid sign extension)
+
+  fixture = ixp.Service.answer({type:ixp.Tread, tag:tag++, fid:1812, offset:offset, count:128});
+  console.log(fixture);
+  test.equals(fixture.type, ixp.Rread);
+  test.equals(fixture.tag, 2002);
   test.done();
 };
 

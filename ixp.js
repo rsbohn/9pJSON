@@ -76,7 +76,6 @@ module.exports.Service = {
         //return this.send9p({type: msgtype.Rread, tag: p.tag, data: "You may find yourself in another part of the world."});
         var f;
         f = this.fids[p.fid];
-        console.log(f);
         if (f === undefined) return this.error9p(p.tag, "no such fid");
         // if (f.open != true) return this.error9p(p.tag, "fid not open");
         if (f.f.qid.type & QTDIR) return read_dirent(this, p, f);
@@ -87,8 +86,10 @@ module.exports.Service = {
 
 var read_dirent = function(service, packet, f) {
   var reply = {type:msgtype.Rread, tag:packet.tag};
+  console.log(packet);
   if (packet.offset === 0) f.bloc = f.nloc = 0;
-  if (packet.offset != f.bloc) return service.error9p(packet.tag, "seek in directory illegal");
+  if (packet.offset != f.bloc) return service.error9p(packet.tag, "seek in directory illegal "+
+    packet.offset +"!=" +f.bloc);
   if (packet.count < 2) return service.error9p(packet.tag, "read too short");
   if (f.nloc >= f.f.nchildren.length) {
     reply.data = "";
