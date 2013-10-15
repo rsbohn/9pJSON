@@ -44,9 +44,12 @@ module.exports.Service = {
     tree: {},
     fids: [],
     answer: function(p) {
+        if (this.verbose) { console.log(p); }
         if (packets[p.type] !== undefined) {
             var handler = packets[p.type].name;
-            return this[handler](p);
+            var response = this[handler](p);
+            if (this.verbose) {console.log(response);}
+            return response;
         } else {
             return this.error9p(p.tag, "unimplemented msg:"+p.type);
         }
@@ -56,7 +59,7 @@ module.exports.Service = {
         return this.send9p({type:msgtype.Rerror, tag:tag, ename:msg});
     },
     send9p: function(p){
-        console.log(">>send9p: "+JSON.stringify(p));
+        return p;
     },
     Tauth: function(p){
         return this.error9p(p.tag, "no auth necessary");
