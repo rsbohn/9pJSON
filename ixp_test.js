@@ -116,3 +116,16 @@ exports.dirent_a = function(test){
 
 //add a test to walk to a file and read it
 // attach, walk, open, read, close
+
+exports.walker = function(test){
+  ixp.Service.verbose=true;
+  var request = {type:ixp.Tattach, tag:3000, fid:427};
+  var fixture = ixp.Service.answer(request);
+  test.equals(fixture.tag, request.tag);
+
+  request.type=ixp.Twalk;
+  request.newfid=429;
+  request.nwname="cows";
+  fixture = ixp.Service.answer(request);
+  test.done();
+};

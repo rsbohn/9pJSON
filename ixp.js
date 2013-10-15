@@ -72,6 +72,12 @@ module.exports.Service = {
         this.fids[p.fid] = { f: this.tree, open: false};
         return this.send9p({type: msgtype.Rattach, tag: p.tag, qid: pack(this.tree.qid, Qid)});
     },
+
+    Twalk: function(p){
+        if(this.fids[p.fid] === undefined) return this.error9p(p.tag, "fid not in use");
+        if(this.fids[p.newfid] !== undefined) return this.error9p(p.tag, "fid already in use");
+        return this.send9p({type:msgtype.Rattach, tag:p.tag});
+    },
     Tread: function(p){
         //return this.send9p({type: msgtype.Rread, tag: p.tag, data: "You may find yourself in another part of the world."});
         var f;
