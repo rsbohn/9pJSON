@@ -13,7 +13,11 @@ module.exports.ipack = ipack = function(fmt, data){
   var packed = "";
   switch (fmt.substring(0,1)){
       case 'i': return npack(data, wide);          
-      case 'R': return data;
+      case 'R':
+        for (var x in data) {
+          packed += counted(data[x].toString(),2);
+        }
+        return packed;
       case 'b':
       case 's':
         packed = data.substring(0, wide);
@@ -73,6 +77,15 @@ var iunpack = function(fmt, data){
       var wide2 = asInteger(data.substring(0,wide));
       data = data.substring(wide);
       return data.substring(0, wide2);
+    case 'R':
+      var out = [];
+      while (data.length > 0) {
+        var len = asInteger(data.substring(0, 2));
+        if (len < 1) { throw "invalid size in array: "+len+" <<"+data+">>"; }
+        out.push(data.substring(2, 2+len));
+        data = data.substring(2+len);
+      }
+      return out;
     default: throw "unpack: unknown type is "+fmt;
   }
 };

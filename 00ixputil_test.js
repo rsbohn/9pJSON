@@ -15,8 +15,8 @@ testcase("ABCDEFG"===util.ipack("s7", "ABCDEFG"));
 testcase("ABC\0\0"===util.ipack("s5", "ABC"));
 unit.tcase(util.ipack("b4", "mood")).shouldEqual("mood");
 
-console.log("should pack a variable length string");
-testcase(string7 === util.ipack("R", string7));
+console.log("should pack an array");
+unit.tcase(util.ipack("R", [string7])).shouldEqual("\u0007\u0000"+string7);
 
 console.log("should pack one field from a map");
 testcase("ABCDEFG"===util.pack({msg:"ABCDEFG"}, ["s7:msg"]));
@@ -49,11 +49,34 @@ unit.tcase(util.pack({s:"cows"},["S4:s"])).shouldEqual("\004\0\0\0cows");
 
 console.log("should unpack counted strings");
 unit.tcase(util.unpack("\004\0dogs",["S2:a"]).a).shouldEqual("dogs");
-var farm = util.unpack("\005\0horse\004\0\0\0duck\003\0cow",
-    ["S2:a","S4:b","S2:c"]);
+var animals="\005\0horse\004\0\0\0duck\003\0cow";
+var farm = util.unpack(animals, ["S2:a","S4:b","S2:c"]);
 unit.tcase(farm.a).shouldEqual("horse");
 unit.tcase(farm.b).shouldEqual("duck");
 unit.tcase(farm.c).shouldEqual("cow");
+
+console.log("should unpack an array");
+//can't reuse 'animals' because of the duck...
+farm = util.unpack("\005\0horse\004\0duck\003\0cow", ["R:a"]).a;
+unit.tcase(farm[0]).shouldEqual("horse");
+unit.tcase(farm[1]).shouldEqual("duck");
+unit.tcase(farm[2]).shouldEqual("cow");
+
+var nums = util.ipack("R", ["duck", [4,14]]);//, 10,20,30]);
+console.log(nums);
+var numa = util.unpack(nums, ["R:a"]).a;
+unit.tcase(numa[0]).shouldEqual("duck");
+unit.tcase(numa[1]).shouldEqual("4,14");
+
+//we can pack anything (with .toString())
+//but we unpack strings.
+nums = util.ipack("R", ["duck", 10, 20, 30]);
+numa = util.unpack(nums, ["R:a"]).a;
+unit.tcase(numa[0]).shouldEqual("duck");
+unit.tcase(numa[1]).shouldEqual("10");
+unit.tcase(numa[2]).shouldEqual("20");
+unit.tcase(numa[3]).shouldEqual("30");
+
 
 
 

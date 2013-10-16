@@ -125,7 +125,7 @@ exports.walker = function(test){
 
   request.type=ixp.Twalk;
   request.newfid=429;
-  request.nwname="cows";
+  request.nwname="/cows/holstein".substring(1).split('/');
   fixture = ixp.Service.answer(request);
   test.done();
 };
