@@ -95,6 +95,10 @@ exports.Tread = function(test) {
   if (verbose) { console.log(fixture);}
   test.equals(fixture.tag, request.tag);
   test.equals(fixture.data, '');
+
+  var reply = ixp.Service.answer({type:ixp.Tclunk, tag:request.tag, fid:request.fid});
+  console.log(reply);
+
   
   test.done();
 };
@@ -116,16 +120,47 @@ exports.dirent_a = function(test){
 
 //add a test to walk to a file and read it
 // attach, walk, open, read, close
+var attach = function(service, chain){
+  var myFid = Math.floor(Math.random()*1024)+1024;
+  var request = {type:ixp.Tattach, tag:3000, fid:myFid};
+  var reply = service.answer(request);
+  chain(request, reply);
+  reply = service.answer({type:ixp.Tclunk, tag:3000, fid:myFid});
+  if (reply.type === ixp.Rerror) { throw reply.ename; }
+};
 
 exports.walker = function(test){
   ixp.Service.verbose=true;
-  var request = {type:ixp.Tattach, tag:3000, fid:427};
-  var fixture = ixp.Service.answer(request);
-  test.equals(fixture.tag, request.tag);
+  attach(ixp.Service, function(request, fixture){
+    request.type=ixp.Twalk;
+    request.newfid=429;
+    request.wname="/cows/holstein".substring(1).split('/');
+    request.nwname=request.wname.length;
+    fixture = ixp.Service.answer(request);
+    test.equals(fixture.type, ixp.Rwalk);
+    //test.equals(fixture.nqid, 2);
+  });
+  test.done();
+};
 
-  request.type=ixp.Twalk;
-  request.newfid=429;
-  request.nwname="/cows/holstein".substring(1).split('/');
-  fixture = ixp.Service.answer(request);
+exports.walk_self = function(test){
+  ixp.Service.verbose=true;
+  attach(ixp.Service, function(request, reply){
+    test.equals(reply.type, ixp.Rattach);
+  });
+  test.done();
+};
+
+exports.zzz = function(test){
+  var fidList = [];
+  for (var x in ixp.Service.fids){
+    if (ixp.Service.fids[x] !== undefined) {
+      fidList.push(x);
+    }
+  }
+
+  //test.equals(ixp.Service.fids.length, 0);
+  test.equals(fidList.length, 0, 
+    "still open: "+fidList.toString());
   test.done();
 };

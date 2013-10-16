@@ -15,7 +15,7 @@ var packets = {
     108: {name: "Tflush", fmt: ["i4:size", "i1:type", "i2:tag", "i2:oldtag"]},
     109: {name: "Rflush", fmt: ["i4:size", "i1:type", "i2:tag"]},
     110: {name: "Twalk", fmt: ["i4:size", "i1:type", "i2:tag", "i4:fid", "i4:newfid", "i2:nwname", "R:wname"]},
-    111: {name: "Rwalk", fmt: ["i4:size", "i1:type", "i2:tag", "i2:nwqid", "R:qids"]},
+    111: {name: "Rwalk", fmt: ["i4:size", "i1:type", "i2:tag", "i2:nqid", "R:qids"]},
     112: {name: "Topen", fmt: ["i4:size", "i1:type", "i2:tag", "i4:fid", "i1:mode"]},
     113: {name: "Ropen", fmt: ["i4:size", "i1:type", "i2:tag", "b13:qid", "i4:iounit"]},
     114: {name: "Tcreate", fmt: ["i4:size", "i1:type", "i2:tag", "i4:fid", "S2:name", "i4:perm", "i1:mode"]},
@@ -79,17 +79,24 @@ module.exports.Service = {
     Twalk: function(p){
         if(this.fids[p.fid] === undefined) return this.error9p(p.tag, "fid not in use");
         if(this.fids[p.newfid] !== undefined) return this.error9p(p.tag, "fid already in use");
-        return this.send9p({type:msgtype.Rattach, tag:p.tag});
+        var f = this.fids[p.fid];
+        //if (!exports.isDir(f)) {        }
+        return this.send9p({type:msgtype.Rwalk, tag:p.tag});
     },
     Tread: function(p){
         //return this.send9p({type: msgtype.Rread, tag: p.tag, data: "You may find yourself in another part of the world."});
-        var f;
-        f = this.fids[p.fid];
+        var f = this.fids[p.fid];
         if (f === undefined) return this.error9p(p.tag, "no such fid");
         // if (f.open != true) return this.error9p(p.tag, "fid not open");
         if (f.f.qid.type & QTDIR) return read_dirent(this, p, f);
         if (f.f.read === undefined) return this.error9p(p.tag, "permission denied");
         return f.f.read(p, f);
+    },
+    ////
+    Tclunk: function(p){
+        if (this.fids[p.fid] === undefined) return this.error9p(p.tag, "fid not in use");
+        delete this.fids[p.fid];
+        return this.send9p({type:msgtype.Rclunk, tag:p.tag});
     }
 };
 
