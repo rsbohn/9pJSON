@@ -80,7 +80,10 @@ module.exports.Service = {
         if(this.fids[p.fid] === undefined) return this.error9p(p.tag, "fid not in use");
         if(this.fids[p.newfid] !== undefined) return this.error9p(p.tag, "fid already in use");
         var f = this.fids[p.fid];
-        //if (!exports.isDir(f)) {        }
+        if (p.nwname === 0) {
+          this.fids[p.newfid] = this.fids[p.fid];
+          return this.send9p({type:msgtype.Rwalk, tag:p.tag, nqid:0});
+        }
         return this.send9p({type:msgtype.Rwalk, tag:p.tag});
     },
     Tread: function(p){

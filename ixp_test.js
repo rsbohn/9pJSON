@@ -134,7 +134,7 @@ exports.walker = function(test){
   attach(ixp.Service, function(request, fixture){
     request.type=ixp.Twalk;
     request.newfid=429;
-    request.wname="/cows/holstein".substring(1).split('/');
+    request.wname="/cows".substring(1).split('/');
     request.nwname=request.wname.length;
     fixture = ixp.Service.answer(request);
     test.equals(fixture.type, ixp.Rwalk);
@@ -143,12 +143,28 @@ exports.walker = function(test){
   test.done();
 };
 
+//walk to self (get a new fid same qid)
 exports.walk_self = function(test){
-  ixp.Service.verbose=true;
+  ixp.Service.verbose=false;
   attach(ixp.Service, function(request, reply){
     test.equals(reply.type, ixp.Rattach);
+    request.type=ixp.Twalk;
+    request.newfid=request.fid+1;
+    request.nwname=0;
+    var fixture = ixp.Service.answer(request);
+    test.equals(fixture.type, ixp.Rwalk);
+    test.equals(fixture.nqid, 0);
+    test.equals(fixture.qids, undefined);
+    //should try to use fixture.newfid
+    //but for now just clunk it
+    ixp.Service.answer(pclunk(request.newfid));
+    
   });
   test.done();
+};
+
+var pclunk = function(fid){
+  return {type:ixp.Tclunk, tag:3000, fid:fid};
 };
 
 exports.zzz = function(test){
