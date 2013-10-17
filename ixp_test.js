@@ -129,20 +129,41 @@ var attach = function(service, chain){
   if (reply.type === ixp.Rerror) { throw reply.ename; }
 };
 
+//I think I'm losing visibility of the protocol here
+//might be better to use JSON literals so you can see what's actually going on.
 exports.walker = function(test){
   ixp.Service.verbose=true;
   attach(ixp.Service, function(request, fixture){
     request.type=ixp.Twalk;
     request.newfid=429;
-    request.wname="/cows".substring(1).split('/');
+    request.wname=["cows"];
     request.nwname=request.wname.length;
     fixture = ixp.Service.answer(request);
     test.equals(fixture.type, ixp.Rwalk);
-    //test.equals(fixture.nqid, 2);
+    test.equals(fixture.nqid, 1);
+    test.equals(fixture.qids[0],root.lookup("/cows").qid);
+    ixp.Service.answer(pclunk(request.newfid));
   });
+
   test.done();
 };
 
+exports.walk2 = function(test){
+  ixp.Service.verbose=false;
+  attach(ixp.Service, function(request, reply) {
+    test.equals(reply.type, ixp.Rattach);
+    var fixture = ixp.Service.answer({
+	type:ixp.Twalk,
+	tag:request.tag,
+	fid:request.fid,
+	newfid:430,
+	wname:["cows","jersey"],
+	nwname:2});
+    test.equals(fixture.ename, "Can't do plaid!");
+ } );
+  test.done();
+};
+	
 //walk to self (get a new fid same qid)
 exports.walk_self = function(test){
   ixp.Service.verbose=false;

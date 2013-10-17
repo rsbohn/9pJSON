@@ -84,7 +84,13 @@ module.exports.Service = {
           this.fids[p.newfid] = this.fids[p.fid];
           return this.send9p({type:msgtype.Rwalk, tag:p.tag, nqid:0});
         }
-        return this.send9p({type:msgtype.Rwalk, tag:p.tag});
+        if (p.nwname === 1) {
+          var nf = f.f.lookup(p.wname[0]);
+          this.fids[p.newfid] = {f: nf, open:false}; 
+          //what if lookup failed? catch exception, return this.error9p(p.tag, "not found");
+          return this.send9p({type:msgtype.Rwalk, tag:p.tag, nqid:1, qids:[nf.qid]});
+        }
+        return this.error9p(p.tag, "Can't do plaid!"); //should be "walk multiple steps not yet implemented"
     },
     Tread: function(p){
         //return this.send9p({type: msgtype.Rread, tag: p.tag, data: "You may find yourself in another part of the world."});
