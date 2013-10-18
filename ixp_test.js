@@ -1,4 +1,5 @@
 var unit = require("./unit"),
+	util = require("./ixputil"),
 	ixp = require("./ixp");
 
 console.log("ixp:");
@@ -191,9 +192,10 @@ var pclunk = function(fid){
 exports.cat1 = function(test){
   root.mkfile("/zero", 
 	null,
-	function(offset, count){ return ""; },
+	function(offset, count){ return util.pad("", count, "\0"); },
 	null,
 	null);
+  test.equals(root.lookup("/zero").read(0,5), "\0\0\0\0\0");
   attach(ixp.Service, function(request, response){
     ixp.Service.verbose=true;
     var fixture = ixp.Service.answer({

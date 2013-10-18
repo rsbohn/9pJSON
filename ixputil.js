@@ -47,6 +47,7 @@ var pad = function(s, wide, fill) {
   s += Array(pwide+1).join(fill);
   return s;
 };
+exports.pad = pad;
 
 module.exports.pack = function(data, spec){
   var out = [];
