@@ -47,12 +47,15 @@ module.exports.Service = {
         if (this.verbose) { console.log(p); }
         if (packets[p.type] !== undefined) {
             var handler = packets[p.type].name;
-            var response = this[handler](p);
-            if (this.verbose) {console.log(response);}
-            return response;
-        } else {
-            return this.error9p(p.tag, "unimplemented msg:"+p.type);
-        }
+            if (this[handler] !== undefined) {
+              var response = this[handler](p);
+              if (this.verbose) {console.log(response);}
+              return response;
+            }
+         }
+        var err = this.error9p(p.tag, "unimplemented msg:"+p.type);
+        if (this.verbose) {console.log(err);}
+        return err;
     },
 
     error9p: function(tag, msg) {

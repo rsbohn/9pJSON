@@ -188,6 +188,38 @@ var pclunk = function(fid){
   return {type:ixp.Tclunk, tag:3000, fid:fid};
 };
 
+exports.cat1 = function(test){
+  root.mkfile("/zero", 
+	null,
+	function(offset, count){ return ""; },
+	null,
+	null);
+  attach(ixp.Service, function(request, response){
+    ixp.Service.verbose=true;
+    var fixture = ixp.Service.answer({
+	type:ixp.Twalk,
+	tag:request.tag,
+	fid:request.fid,
+	newfid: 440,
+	wname: ["zero"],
+	nwname: 1});
+    if (fixture.type !== ixp.Rwalk) { return 0;}
+    fixture = ixp.Service.answer({
+	type:ixp.Topen,
+	tag:request.tag,
+	fid:440,
+	mode:0});
+    if (fixture.type !== ixp.Ropen) {
+	test.ok(false, fixture.ename);
+	ixp.Service.answer(pclunk(440));
+	return 0;
+    }
+
+  });
+
+  test.done();
+};
+
 exports.zzz = function(test){
   var fidList = [];
   for (var x in ixp.Service.fids){
