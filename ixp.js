@@ -53,7 +53,7 @@ module.exports.Service = {
               return response;
             }
          }
-        var err = this.error9p(p.tag, "unimplemented msg:"+p.type);
+        var err = this.error9p(p.tag, "unimplemented type="+p.type);
         if (this.verbose) {console.log(err);}
         return err;
     },
@@ -95,6 +95,21 @@ module.exports.Service = {
         }
         return this.error9p(p.tag, "Can't do plaid!"); //should be "walk multiple steps not yet implemented"
     },
+
+    Topen: function(p){
+        var node = this.fids[p.fid];
+        if (node === undefined) { return this.error9p(p.tag, "no such fid"); }
+        //will ignore node.f.open for now
+        var reason = must_deny_access(node.f, p.mode);
+        if (!reason) {
+          if (isDir(node.f)) { node.f.bloc = node.f.nloc = 0;}
+          node.f.open=true;
+          return this.send9p({type:msgtype.Ropen, tag:p.tag, qid: pack(node.f.qid, Qid), iounit:0});
+        } else { 
+            return this.error9p(p.tag, "permission denied: "+reason);
+        }
+    },
+
     Tread: function(p){
         //return this.send9p({type: msgtype.Rread, tag: p.tag, data: "You may find yourself in another part of the world."});
         var f = this.fids[p.fid];
@@ -110,6 +125,14 @@ module.exports.Service = {
         delete this.fids[p.fid];
         return this.send9p({type:msgtype.Rclunk, tag:p.tag});
     }
+};
+
+var must_deny_access = function(f, mode) {
+  var reason;
+  if (isDir(f)) { return (mode & 3) ? "directories are read only" : false; }
+  if (mode & 3 === 3) { return "OEXEC not implemented";}
+  if (mode & 3 && f.write === undefined) { return "read only";}
+  return false;
 };
 
 var read_dirent = function(service, packet, f) {
@@ -203,10 +226,10 @@ function lookup(path, getParent) {
     return f;
 }
 
-module.exports.isDir = function(i){
+var isDir = exports.isDir = function(i){
     return (i.qid.type === QTDIR);
 };
-module.exports.isFile = function(i){
+var isFile = exports.isFile = function(i){
     return (i.qid.type !== QTDIR);
 };
 

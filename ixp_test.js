@@ -133,7 +133,7 @@ var attach = function(service, chain){
 //I think I'm losing visibility of the protocol here
 //might be better to use JSON literals so you can see what's actually going on.
 exports.walker = function(test){
-  ixp.Service.verbose=true;
+  ixp.Service.verbose=false;
   attach(ixp.Service, function(request, fixture){
     request.type=ixp.Twalk;
     request.newfid=429;
@@ -189,6 +189,23 @@ var pclunk = function(fid){
   return {type:ixp.Tclunk, tag:3000, fid:fid};
 };
 
+var tname = function(t){ return ixp.packets[t].name;};
+
+exports.open_close=function(test){
+  attach(ixp.Service, function(request, response){
+    //open an unknown fid
+    var fixture = ixp.Service.answer({type:ixp.Topen, tag:request.tag, fid:435, mode:0});
+    test.equals(fixture.ename, "no such fid"); 
+
+    //open the root directory
+    fixture = ixp.Service.answer({type:ixp.Topen, tag:request.tag, fid:request.fid, mode:0});
+    test.equals(tname(fixture.type), "Ropen", fixture.ename);
+    if (fixture.type === ixp.Ropen) {
+      ixp.Service.answer({type:ixp.Tclose, tag:request.tag, fid:request.fid});
+    }
+  });
+  test.done();
+};
 exports.cat1 = function(test){
   root.mkfile("/zero", 
 	null,
@@ -197,7 +214,7 @@ exports.cat1 = function(test){
 	null);
   test.equals(root.lookup("/zero").read(0,5), "\0\0\0\0\0");
   attach(ixp.Service, function(request, response){
-    ixp.Service.verbose=true;
+    ixp.Service.verbose=false;
     var fixture = ixp.Service.answer({
 	type:ixp.Twalk,
 	tag:request.tag,
@@ -211,11 +228,11 @@ exports.cat1 = function(test){
 	tag:request.tag,
 	fid:440,
 	mode:0});
-    if (fixture.type !== ixp.Ropen) {
-	test.ok(false, fixture.ename);
-	ixp.Service.answer(pclunk(440));
-	return 0;
-    }
+    test.equals(tname(fixture.type), "Ropen", fixture.ename);
+    if (fixture.type === ixp.Ropen) {
+
+    } 
+    ixp.Service.answer(pclunk(440));
 
   });
 
