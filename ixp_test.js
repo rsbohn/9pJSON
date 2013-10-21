@@ -198,7 +198,10 @@ exports.open_close=function(test){
     fixture = ixp.Service.answer({type:ixp.Topen, tag:request.tag, fid:request.fid, mode:0});
     test.equals(tname(fixture.type), "Ropen", fixture.ename);
     if (fixture.type === ixp.Ropen) {
-      ixp.Service.answer({type:ixp.Tclose, tag:request.tag, fid:request.fid});
+      //there is no Tclose, and the file is clunked in attach()
+      //so we don't need to do anything here.
+      //fixture = ixp.Service.answer({type:ixp.Tclose, tag:request.tag, fid:request.fid});
+      //test.equals(tname(fixture.type), "Rclose", fixture.ename);
     }
   });
   test.done();
