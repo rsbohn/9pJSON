@@ -103,7 +103,8 @@ module.exports.Service = {
         var reason = must_deny_access(node.f, p.mode);
         if (!reason) {
           if (isDir(node.f)) { node.f.bloc = node.f.nloc = 0;}
-          node.f.open=true;
+          node.open=true;
+         //console.log(node);
           return this.send9p({type:msgtype.Ropen, tag:p.tag, qid: pack(node.f.qid, Qid), iounit:0});
         } else { 
             return this.error9p(p.tag, "permission denied: "+reason);
@@ -111,13 +112,12 @@ module.exports.Service = {
     },
 
     Tread: function(p){
-        //return this.send9p({type: msgtype.Rread, tag: p.tag, data: "You may find yourself in another part of the world."});
-        var f = this.fids[p.fid];
-        if (f === undefined) return this.error9p(p.tag, "no such fid");
-        // if (f.open != true) return this.error9p(p.tag, "fid not open");
-        if (f.f.qid.type & QTDIR) return read_dirent(this, p, f);
-        if (f.f.read === undefined) return this.error9p(p.tag, "permission denied");
-        return f.f.read(p, f);
+        var node = this.fids[p.fid];
+        if (node === undefined) return this.error9p(p.tag, "no such fid");
+        if (node.open !== true) return this.error9p(p.tag, "fid not open");
+        if (node.f.qid.type & QTDIR) return read_dirent(this, p, node);
+        if (node.f.read === undefined) return this.error9p(p.tag, "permission denied");
+        return node.f.read(p, node);
     },
     ////
     Tclunk: function(p){

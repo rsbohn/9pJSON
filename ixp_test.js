@@ -59,41 +59,47 @@ var verbose = false;
 
 ixp.Service.send9p = function(p){return p;};
 exports.Tread = function(test) {
-  verbose = false;
+  ixp.Service.verbose = false;
+  var fixture = ixp.Service.answer({type:ixp.Topen, tag:2000, fid:1812, mode:0});
+  test.equals(tname(fixture.type), "Ropen", fixture.ename);
 
   var request = {type:ixp.Tread, tag:2001, fid:1812, count:128, offset:0};
-  var fixture =  ixp.Service.answer(request);
-  test.equals(fixture.type, 117);
-  test.equals(fixture.tag, 2001);
-  var dent = util.unpack(fixture.data, fmt_dirent);
+  fixture =  ixp.Service.answer(request);
+  test.equals(tname(fixture.type), "Rread", fixture.ename);
+  if (fixture.type === ixp.Rread) {
+    test.equals(fixture.tag, 2001);
+    var dent = util.unpack(fixture.data, fmt_dirent);
+  
+    test.equals(dent.name, "a"); 
+    test.equals(dent.mode & 0777, 0111);
+    test.equals(dent.mode >>> 24, 0x80); //DMDIR >>> 24 (to avoid sign extension)
+  
+    request.offset += fixture.data.length;
+    request.tag++;
+    fixture = ixp.Service.answer(request);
+  
+    test.equals(fixture.type, ixp.Rread);
+    test.equals(fixture.tag, request.tag);
+    dent = util.unpack(fixture.data, fmt_dirent);
+    test.equals(dent.name, 'cows');
+  
+    //at the end
+    request.offset += fixture.data.length;
+    fixture = ixp.Service.answer(request);
+  
+    test.equals(fixture.tag, request.tag);
+    test.equals(fixture.data, '');
+  
+    //we're at the end+1, can we still read?
+    //no need to update request.offset
+    request.tag++;
+    fixture = ixp.Service.answer(request);
+  
+    test.equals(fixture.tag, request.tag);
+    test.equals(fixture.data, '');
 
-  test.equals(dent.name, "a"); 
-  test.equals(dent.mode & 0777, 0111);
-  test.equals(dent.mode >>> 24, 0x80); //DMDIR >>> 24 (to avoid sign extension)
 
-  request.offset += fixture.data.length;
-  request.tag++;
-  fixture = ixp.Service.answer(request);
-
-  test.equals(fixture.type, ixp.Rread);
-  test.equals(fixture.tag, request.tag);
-  dent = util.unpack(fixture.data, fmt_dirent);
-  test.equals(dent.name, 'cows');
-
-  //at the end
-  request.offset += fixture.data.length;
-  fixture = ixp.Service.answer(request);
-
-  test.equals(fixture.tag, request.tag);
-  test.equals(fixture.data, '');
-
-  //we're at the end+1, can we still read?
-  //no need to update request.offset
-  request.tag++;
-  fixture = ixp.Service.answer(request);
-
-  test.equals(fixture.tag, request.tag);
-  test.equals(fixture.data, '');
+  }
 
   var reply = ixp.Service.answer({type:ixp.Tclunk, tag:request.tag, fid:request.fid});
   test.equals(tname(reply.type), "Rclunk", reply.ename);
@@ -236,6 +242,17 @@ exports.cat1 = function(test){
 
   });
 
+  test.done();
+};
+
+exports['read unopened'] = function(test){
+  attach(ixp.Service, function(request, response){
+    test.equals(tname(response.type), "Rattach", response.ename);
+    var fixture = ixp.Service.answer({
+      type:ixp.Tread, tag:request.tag, fid:request.fid});
+    test.equals(tname(fixture.type), "Rerror");
+    test.equals(fixture.ename, "fid not open");
+  });
   test.done();
 };
 
