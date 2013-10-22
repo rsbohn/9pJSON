@@ -117,7 +117,7 @@ module.exports.Service = {
         if (node.open !== true) return this.error9p(p.tag, "fid not open");
         if (node.f.qid.type & QTDIR) return read_dirent(this, p, node);
         if (node.f.read === undefined) return this.error9p(p.tag, "permission denied");
-        return node.f.read(p, node);
+        return read_file(this, p, node);
     },
     ////
     Tclunk: function(p){
@@ -133,6 +133,11 @@ var must_deny_access = function(f, mode) {
   if (mode & 3 === 3) { return "OEXEC not implemented";}
   if (mode & 3 && f.write === undefined) { return "read only";}
   return false;
+};
+
+var read_file = function(service, packet, node) {
+  var data = node.f.read(packet.offset, packet.count);
+  return service.send9p({type:msgtype.Rread, tag:packet.tag, count:5, data:data});
 };
 
 var read_dirent = function(service, packet, f) {
