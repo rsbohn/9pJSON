@@ -74,6 +74,7 @@ module.exports.Service = {
     },
 
     Tattach: function(p){
+        if (p.fid === undefined) return this.error9p(p.tag, "attach requires a fid");
         if (this.fids[p.fid] !== undefined) return this.error9p(p.tag, "fid already in use");
         this.fids[p.fid] = { f: this.tree, open: false};
         return this.send9p({type: msgtype.Rattach, tag: p.tag, qid: pack(this.tree.qid, Qid)});
