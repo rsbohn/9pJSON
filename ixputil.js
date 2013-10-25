@@ -1,3 +1,4 @@
+(function(exports){
 var fuzz = function(n){ 
     var s, i;
 
@@ -7,8 +8,8 @@ var fuzz = function(n){
     return s;
 };
 
-module.exports.fuzz = fuzz;
-module.exports.ipack = ipack = function(fmt, data){
+exports.fuzz = fuzz;
+exports.ipack = ipack = function(fmt, data){
   var wide = fmt.substring(1);
   var packed = "";
   switch (fmt.substring(0,1)){
@@ -49,7 +50,7 @@ var pad = function(s, wide, fill) {
 };
 exports.pad = pad;
 
-module.exports.pack = function(data, spec){
+exports.pack = function(data, spec){
   var out = [];
   for (var x in spec) {
     var ss = spec[x].split(":");
@@ -91,7 +92,7 @@ var iunpack = function(fmt, data){
   }
 };
 
-module.exports.unpack = function(data, spec){
+exports.unpack = function(data, spec){
   var out = {};
   for (var x in spec) {
     var ss = spec[x].split(":");
@@ -106,4 +107,6 @@ module.exports.unpack = function(data, spec){
   }
   return out;
 };
+
+})(typeof(exports)==='undefined' ? this.ixputils={} : exports) ;
     
