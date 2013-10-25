@@ -1,3 +1,4 @@
+// cat ixputil.js ixp.js > ixp.all.js
 var util = require("./ixputil"),
 pack = util.pack;
 
