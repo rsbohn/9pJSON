@@ -261,6 +261,20 @@ exports['read unopened'] = function(test){
   test.done();
 };
 
+exports['create directory'] = function(test){
+  attach(ixp.Service, function(request, response){
+    test.equals(tname(response.type), "Rattach", response.ename);
+    var fixture = ixp.Service.answer({
+	type:ixp.Tcreate, tag:request.tag, fid:request.fid, name:"shoehorn",
+	perm:0700+0x80000000, mode:0});
+    test.equals(tname(fixture.type), "Rcreate", fixture.ename);
+    //here we check root directly
+    var check = root.lookup("shoehorn");
+    test.ok(isDir(check), "should be a directory");
+  });
+  test.done();
+};
+
 exports.zzz = function(test){
   var fidList = [];
   for (var x in ixp.Service.fids){
