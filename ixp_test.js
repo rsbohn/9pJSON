@@ -2,6 +2,8 @@ var unit = require("./unit"),
 	util = require("./ixputil"),
 	ixp = require("./ixp");
 
+ixp.set_util(util);
+
 console.log("ixp:");
 var root = ixp.mkroot();
 root.mkdir("/a").mkdir("b");

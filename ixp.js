@@ -1,6 +1,7 @@
 // cat ixputil.js ixp.js > ixp.all.js
-var util = require("./ixputil"),
-pack = util.pack;
+(function(exports){
+var util = {};
+exports.set_util = function(that){util=that;};
 
 var QTDIR = 0x80;
 var Qid = ["i1:type", "i4:ver", "i8:path"];
@@ -20,6 +21,7 @@ var packets = {
     112: {name: "Topen", fmt: ["i4:size", "i1:type", "i2:tag", "i4:fid", "i1:mode"]},
     113: {name: "Ropen", fmt: ["i4:size", "i1:type", "i2:tag", "b13:qid", "i4:iounit"]},
     114: {name: "Tcreate", fmt: ["i4:size", "i1:type", "i2:tag", "i4:fid", "S2:name", "i4:perm", "i1:mode"]},
+    115: {name: "Rcreate", fmt:["i4:size", "i1:type", "i2:tag", "i13:qid", "i4:iounit"]},
     116: {name: "Tread", fmt: ["i4:size", "i1:type", "i2:tag", "i4:fid", "i8:offset", "i4:count"]},
     117: {name: "Rread", fmt: ["i4:size", "i1:type", "i2:tag", "S4:data"]},
     118: {name: "Twrite", fmt: ["i4:size", "i1:type", "i2:tag", "i4:fid", "i8:offset", "S4:data"]},
@@ -78,7 +80,7 @@ module.exports.Service = {
         if (p.fid === undefined) return this.error9p(p.tag, "attach requires a fid");
         if (this.fids[p.fid] !== undefined) return this.error9p(p.tag, "fid already in use");
         this.fids[p.fid] = { f: this.tree, open: false};
-        return this.send9p({type: msgtype.Rattach, tag: p.tag, qid: pack(this.tree.qid, Qid)});
+        return this.send9p({type: msgtype.Rattach, tag: p.tag, qid: util.pack(this.tree.qid, Qid)});
     },
 
     Twalk: function(p){
@@ -107,10 +109,14 @@ module.exports.Service = {
           if (isDir(node.f)) { node.f.bloc = node.f.nloc = 0;}
           node.open=true;
          //console.log(node);
-          return this.send9p({type:msgtype.Ropen, tag:p.tag, qid: pack(node.f.qid, Qid), iounit:0});
+          return this.send9p({type:msgtype.Ropen, tag:p.tag, qid: util.pack(node.f.qid, Qid), iounit:0});
         } else { 
             return this.error9p(p.tag, "permission denied: "+reason);
         }
+    },
+
+    Tcreate: function(p){
+        return this.error9p(p.tag, "permission denied");
     },
 
     Tread: function(p){
@@ -169,11 +175,11 @@ var read_dirent = function(service, packet, f) {
 exports.dirent = function(f){
   var fmt= ["i2:type", "i4:dev", "b13:qid", "i4:mode", "i4:atime", "i4:mtime", "i8:length", "S2:name", "S2:uid", "S2:gid", "S2:muid"];
   var now = new Date().getTime() / 1000;
-  var s = { type: 0, dev: 0, qid: pack(f.qid, Qid), mode: 0, atime: now, mtime: now, length: 0, 
+  var s = { type: 0, dev: 0, qid: util.pack(f.qid, Qid), mode: 0, atime: now, mtime: now, length: 0, 
     name: f.name, uid: "js", gid: "js", muid: "js"};
   if(f.qid.type & QTDIR) { s.mode |= 0111; s.mode += 0x80000000; }
-  var packed = pack(s, fmt);
-  var size = pack({ a:packed.length },["i2:a"]);
+  var packed = util.pack(s, fmt);
+  var size = util.pack({ a:packed.length },["i2:a"]);
   return size + packed;
 };
 
@@ -251,3 +257,5 @@ module.exports.mkroot = function(){
         lookup: lookup
     };
 };
+
+})(typeof(exports)==='undefined' ? this.ixputils={} : exports);
