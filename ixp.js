@@ -44,6 +44,7 @@ for (var p in packets) {
 }
 
 module.exports.Service = {
+    msgtype: msgtype,
     tree: {},
     fids: [],
     answer: function(p) {

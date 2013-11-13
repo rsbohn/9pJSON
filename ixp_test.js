@@ -1,6 +1,7 @@
 var unit = require("./unit"),
 	util = require("./ixputil"),
 	ixp = require("./ixp");
+	attach = require("./client").attach;
 
 ixp.set_util(util);
 
@@ -61,7 +62,7 @@ var verbose = false;
 
 ixp.Service.send9p = function(p){return p;};
 exports.Tread = function(test) {
-  ixp.Service.verbose = false;
+  ixp.Service.verbose = verbose;
   var fixture = ixp.Service.answer({type:ixp.Topen, tag:2000, fid:1812, mode:0});
   test.equals(tname(fixture.type), "Ropen", fixture.ename);
 
@@ -125,20 +126,11 @@ exports.dirent_a = function(test){
 };
 
 //add a test to walk to a file and read it
-// attach, walk, open, read, close
-var attach = function(service, chain){
-  var myFid = Math.floor(Math.random()*1024)+1024;
-  var request = {type:ixp.Tattach, tag:3000, fid:myFid};
-  var reply = service.answer(request);
-  chain(request, reply);
-  reply = service.answer({type:ixp.Tclunk, tag:3000, fid:myFid});
-  if (reply.type === ixp.Rerror) { throw reply.ename; }
-};
 
 //I think I'm losing visibility of the protocol here
 //might be better to use JSON literals so you can see what's actually going on.
 exports.walker = function(test){
-  ixp.Service.verbose=false;
+  ixp.Service.verbose=verbose;
   attach(ixp.Service, function(request, fixture){
     request.type=ixp.Twalk;
     request.newfid=429;
@@ -155,7 +147,7 @@ exports.walker = function(test){
 };
 
 exports.walk2 = function(test){
-  ixp.Service.verbose=false;
+  ixp.Service.verbose=verbose;
   attach(ixp.Service, function(request, reply) {
     test.equals(reply.type, ixp.Rattach);
     var fixture = ixp.Service.answer({
@@ -172,7 +164,7 @@ exports.walk2 = function(test){
 	
 //walk to self (get a new fid same qid)
 exports.walk_self = function(test){
-  ixp.Service.verbose=false;
+  ixp.Service.verbose=verbose;
   attach(ixp.Service, function(request, reply){
     test.equals(reply.type, ixp.Rattach);
     request.type=ixp.Twalk;
@@ -222,7 +214,7 @@ exports.cat1 = function(test){
 	null);
   test.equals(root.lookup("/zero").read(0,5), "\0\0\0\0\0");
   attach(ixp.Service, function(request, response){
-    ixp.Service.verbose=false;
+    ixp.Service.verbose=verbose;
     var fixture = ixp.Service.answer({
 	type:ixp.Twalk,
 	tag:request.tag,
@@ -263,19 +255,6 @@ exports['read unopened'] = function(test){
   test.done();
 };
 
-exports['create directory'] = function(test){
-  attach(ixp.Service, function(request, response){
-    test.equals(tname(response.type), "Rattach", response.ename);
-    var fixture = ixp.Service.answer({
-	type:ixp.Tcreate, tag:request.tag, fid:request.fid, name:"shoehorn",
-	perm:0700+0x80000000, mode:0});
-    test.equals(tname(fixture.type), "Rcreate", fixture.ename);
-    //here we check root directly
-    var check = root.lookup("shoehorn");
-    test.ok(isDir(check), "should be a directory");
-  });
-  test.done();
-};
 
 exports.zzz = function(test){
   var fidList = [];
