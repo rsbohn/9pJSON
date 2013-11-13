@@ -117,7 +117,12 @@ module.exports.Service = {
     },
 
     Tcreate: function(p){
-        return this.error9p(p.tag, "permission denied");
+        if (p.perm < 0xFFFF) return this.error9p(p.tag, "permission denied");
+        if (p.mode !== 0) return this.error9p(p.tag, "permission denied");
+        var node = this.fids[p.fid];
+        node.f = this.tree.mkdir(p.name);
+        node.f.open = true;
+        return this.send9p({type:msgtype.Ropen, tag:p.tag});
     },
 
     Tread: function(p){

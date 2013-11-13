@@ -17,10 +17,10 @@ exports['create directory'] = function(test){
     var fixture = ixp.Service.answer({
 	type:ixp.Tcreate, tag:request.tag, fid:request.fid, name:"shoehorn",
 	perm:0700+0x80000000, mode:0});
-    test.equals(tname(fixture.type), "Rcreate", fixture.ename);
+    test.equals(tname(fixture.type), "Ropen", fixture.ename);
     //here we check root directly
     var check = root.lookup("shoehorn");
-    test.ok(isDir(check), "should be a directory");
+    test.ok(ixp.isDir(check), "should be a directory");
   });
   test.done();
 };
