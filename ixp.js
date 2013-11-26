@@ -34,16 +34,16 @@ var packets = {
     126: {name: "Twstat", fmt: ["i4:size", "i1:type", "i2:tag", "i4:fid", "S2:stat"]}
 };
 
-module.exports.packets = packets;
+exports.packets = packets;
 
 var msgtype = {};
 for (var p in packets) {
     //console.log(""+p+" "+JSON.stringify(packets[p].name+" -> "+packets[p].fmt));
-    module.exports[packets[p].name] = p;
+    exports[packets[p].name] = p;
     msgtype[packets[p].name] = p;
 }
 
-module.exports.Service = {
+exports.Service = {
     msgtype: msgtype,
     tree: {},
     fids: [],
@@ -252,7 +252,7 @@ var isFile = exports.isFile = function(i){
     return (i.qid.type !== QTDIR);
 };
 
-module.exports.mkroot = function(){
+exports.mkroot = function(){
     return {
         name: "/", 
         children: {}, 
@@ -264,4 +264,4 @@ module.exports.mkroot = function(){
     };
 };
 
-})(typeof(exports)==='undefined' ? this.ixputils={} : exports);
+})(typeof(exports)==='undefined' ? this.ixp={} : exports);
