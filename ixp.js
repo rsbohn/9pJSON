@@ -181,12 +181,10 @@ var read_dirent = function(service, packet, f) {
 exports.dirent = function(f){
   var fmt= ["i2:type", "i4:dev", "b13:qid", "i4:mode", "i4:atime", "i4:mtime", "i8:length", "S2:name", "S2:uid", "S2:gid", "S2:muid"];
   var now = new Date().getTime() / 1000;
-  var s = { type: 0, dev: 0, qid: util.pack(f.qid, Qid), mode: 0, atime: now, mtime: now, length: 0, 
+  var s = { type: 0, dev: 0, qid: f.qid, mode: 0, atime: now, mtime: now, length: 1, 
     name: f.name, uid: "js", gid: "js", muid: "js"};
   if(f.qid.type & QTDIR) { s.mode |= 0111; s.mode += 0x80000000; }
-  var packed = util.pack(s, fmt);
-  var size = util.pack({ a:packed.length },["i2:a"]);
-  return size + packed;
+  return s;
 };
 
 // filesystem funcs

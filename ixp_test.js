@@ -71,7 +71,7 @@ exports.Tread = function(test) {
   test.equals(tname(fixture.type), "Rread", fixture.ename);
   if (fixture.type === ixp.Rread) {
     test.equals(fixture.tag, 2001);
-    var dent = util.unpack(fixture.data, fmt_dirent);
+    var dent = fixture.data;
   
     test.equals(dent.name, "a"); 
     test.equals(dent.mode & 0777, 0111);
@@ -83,7 +83,7 @@ exports.Tread = function(test) {
   
     test.equals(fixture.type, ixp.Rread);
     test.equals(fixture.tag, request.tag);
-    dent = util.unpack(fixture.data, fmt_dirent);
+    dent = fixture.data;
     test.equals(dent.name, 'cows');
   
     //at the end
@@ -112,14 +112,14 @@ exports.Tread = function(test) {
 
 
 exports.dirent = function(test) {
-  var fixture = util.unpack(ixp.dirent(root), fmt_dirent);
+  var fixture = ixp.dirent(root);
   test.equals(fixture.type, "0", "dirent type fail");
   test.equals(fixture.name, "/", "dirent name fail");
   test.done();
 };
 
 exports.dirent_a = function(test){
-  var fixture = util.unpack(ixp.dirent(root.lookup("a")), fmt_dirent);
+  var fixture = ixp.dirent(root.lookup("a"));
   test.equals(fixture.type, "0");
   test.equals(fixture.name, "a");
   test.done();

@@ -11,6 +11,12 @@
     ixp.Service.tree=ixp.mkroot();
     var s = ixp.Service;
     s.tree.mkdir("/goo");
+var test_read =function(){
+  s.answer({type:s.msgtype.Tattach, tag:0, fid:0});
+  s.answer({type:s.msgtype.Topen, tag:0, fid:0});
+  var g = s.answer({type:s.msgtype.Tread, tag:0, fid:0, offset:0, count:1024});
+  console.log(g);
+};
   </script>
 </body>
 </html>
