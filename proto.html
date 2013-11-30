@@ -1,22 +1,67 @@
+<!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
 <title>9serve:/</title>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.3/angular.min.js"></script>
+<style>
+.test-pass { background: #339933; }
+.test-fail { background: #ff9999;}
+.unstyled { list-style-type: none; }
+.games { float:right; background: #999;}
+</style>
 </head>
-<body>
+<body ng-app>
   <h1>9serve Prototype</h1>
+  <div class="games">
+  <canvas id="catclock" width="240" height="320"></canvas>
+  </div>
   <div>We are all just prisoners here of our own device.</div>
+  <div ng-controller="TestResults">
+  <ul class="unstyled">
+    <li ng-repeat="result in results">
+    <span class="test-{{result.passfail}}">{{result.name}}</span>
+    </li>
+  </ul>
+  </div>
   <script src="ixp.all.js"></script>
   <script>
-    ixp.set_util(ixputils);
-    ixp.Service.tree=ixp.mkroot();
-    var s = ixp.Service;
-    s.tree.mkdir("/goo");
+ixp.set_util(ixputils);
+ixp.Service.tree=ixp.mkroot();
+var s = ixp.Service;
+s.tree.mkdir("/goo");
+s.tree.mkdir("/cow");
+
+function TestResults($scope){
+  $scope.results = [
+    {passfail:"pass", name:"passing test"},
+    {passfail:"fail", name:"failing test"}
+  ];
+  $scope.results = [];
+
+var report = function(pf, text) {
+  $scope.results.push({passfail: pf ? "pass" : "fail", name: text});
+};
+
 var test_read =function(){
   s.answer({type:s.msgtype.Tattach, tag:0, fid:0});
   s.answer({type:s.msgtype.Topen, tag:0, fid:0});
   var g = s.answer({type:s.msgtype.Tread, tag:0, fid:0, offset:0, count:1024});
   console.log(g);
+  var n = g.data.indexOf('goo');
+  $scope.results.push({
+	passfail: (n >= 0) ? "pass" : "fail",
+	name: "find goo in tree"});
+  g = s.answer({type:s.msgtype.Tread, tag:0, fid:0, offset:g.data.length, count:1024});
+  console.log(g);
+  if (g.type === s.msgtype.Rread) {
+    report(g.data.indexOf('cow') >= 0, "find cow in tree");
+  } else {
+    report(false, "cow: "+g.ename);
+  }
 };
+test_read();
+}
   </script>
 </body>
 </html>
