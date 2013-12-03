@@ -48,14 +48,11 @@ var test_read =function(){
   s.answer({type:s.msgtype.Topen, tag:0, fid:0});
   var g = s.answer({type:s.msgtype.Tread, tag:0, fid:0, offset:0, count:1024});
   console.log(g);
-  var n = g.data.indexOf('goo');
-  $scope.results.push({
-	passfail: (n >= 0) ? "pass" : "fail",
-	name: "find goo in tree"});
+  report(g.data.name === 'goo', "find goo in tree");
   g = s.answer({type:s.msgtype.Tread, tag:0, fid:0, offset:g.data.length, count:1024});
   console.log(g);
   if (g.type === s.msgtype.Rread) {
-    report(g.data.indexOf('cow') >= 0, "find cow in tree");
+    report(g.data.name === 'cow', "find cow in tree");
   } else {
     report(false, "cow: "+g.ename);
   }
