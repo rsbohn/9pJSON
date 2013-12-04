@@ -7,10 +7,10 @@ module.exports = function(grunt){
     concat: {
       dist: {
 	options: {
-	    banner: "//grunt-contrib-concat made this\n"
+            banner: "//grunt-contrib-concat made this\n"
 	},
 	files: {
-	    'ixp.all.js':  ['ixp.js', 'ixputil.js']
+            'ixp.all.js':  ['ixp.js', 'ixputil.js']
 	}
        }
     },
