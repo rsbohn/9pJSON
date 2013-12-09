@@ -29,5 +29,22 @@ exports.update = function(){
   }
 }
 
+exports.append = function(s){
+  var max = 8
+  for (x in s) {
+    if (x < max) { exports.add(s.charCodeAt(x));}
+    else { break; }
+  }
+}
+
 exports.update();
 })(typeof(exports)==='undefined' ? this.drawchart={} : exports);
+
+function CanvasCtrl($scope, $timeout) {
+  var promise;
+  $scope.tick = function(){
+    drawchart.update();
+    promise = $timeout($scope.tick, 1000);
+  }
+  promise = $scope.tick();
+}
