@@ -133,7 +133,16 @@ exports.Service = {
         if (node.f.read === undefined) return this.error9p(p.tag, "permission denied");
         return read_file(this, p, node);
     },
-    ////
+
+    Twrite: function(p){
+	var node = this.fids[p.fid];
+	if(node === undefined) return this.error9p(p.tag, "no such fid");
+	if(node.open !== true) return this.error9p(p.tag, "fid not open");
+	if(node.f.qid.type & QTDIR) return this.error9p(p.tag, "permission denied");
+	if(node.f.write === undefined) return this.error9p(p.tag, "permission denied");
+	return write_file(this, p, node);
+    },
+    
     Tclunk: function(p){
         if (this.fids[p.fid] === undefined) return this.error9p(p.tag, "fid not in use");
         delete this.fids[p.fid];
