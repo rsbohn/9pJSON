@@ -62,7 +62,7 @@ var verbose = false;
 
 ixp.Service.send9p = function(p){return p;};
 exports.Tread = function(test) {
-  ixp.Service.verbose = verbose;
+  ixp.Service.verbose = false;
   var fixture = ixp.Service.answer({type:ixp.Topen, tag:2000, fid:1812, mode:0});
   test.equals(tname(fixture.type), "Ropen", fixture.ename);
 
@@ -230,12 +230,12 @@ exports.cat1 = function(test){
 	mode:0});
     test.equals(tname(fixture.type), "Ropen", fixture.ename);
     if (fixture.type === ixp.Ropen) {
-	ixp.Service.verbose=true;
+	//ixp.Service.verbose=true;
 	fixture = ixp.Service.answer({type:ixp.Tread, fid:440, tag:request.tag, offset:0, count:5});
 	test.equals(tname(fixture.type), "Rread", fixture.ename);
 	test.equals(fixture.count, 5);
 	test.equals(fixture.data, "\0\0\0\0\0");
-	ixp.Service.verbose=false;
+	//ixp.Service.verbose=false;
     } 
     ixp.Service.answer(pclunk(440));
 
