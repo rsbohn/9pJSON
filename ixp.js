@@ -153,7 +153,7 @@ exports.Service = {
 var must_deny_access = function(f, mode) {
   var reason;
   if (isDir(f)) { return (mode & 3) ? "directories are read only" : false; }
-  if (mode & 3 === 3) { return "OEXEC not implemented";}
+  if ((mode & 3) === 3) { return "OEXEC not implemented";}
   if (mode & 3 && f.write === undefined) { return "read only";}
   return false;
 };
@@ -161,6 +161,11 @@ var must_deny_access = function(f, mode) {
 var read_file = function(service, packet, node) {
   var data = node.f.read(packet.offset, packet.count);
   return service.send9p({type:msgtype.Rread, tag:packet.tag, count:5, data:data});
+};
+
+var write_file = function(service, packet, node) {
+  var n = node.f.write(packet.offset, packet.data);
+  return service.send9p({type:msgtype.Rwrite, tag:packet.tag, count: n});
 };
 
 var read_dirent = function(service, packet, f) {
