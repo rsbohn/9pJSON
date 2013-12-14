@@ -62,7 +62,7 @@ test_read();
   </script>
 <script src="dist/drawchart.js"></script>
 <script>
-cv=s.tree.mkfile("/canvas", undefined, function(f,p){return("splat")}, function(f,p){drawchart.append(p.data)}, undefined);
+cv=s.tree.mkfile("/canvas", undefined, function(f,p){return("splat")}, function(o,d){drawchart.append(d);return Math.min(8, d.length)}, undefined);
 // attach, walk([canvas]), open, read -> "splat"
 // ... open(write), write({data:"\020\020\020"}) -> (append to canvas)
 </script>
