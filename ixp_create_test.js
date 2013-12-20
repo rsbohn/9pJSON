@@ -7,7 +7,7 @@ ixp.set_util(util);
 
 var root = ixp.mkroot();
 ixp.Service.tree = root;
-var verbose = true;
+var verbose = false;
 var tname = function(t){ return ixp.packets[t].name;};
 
 exports['create directory'] = function(test){

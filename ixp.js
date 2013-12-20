@@ -48,6 +48,8 @@ exports.Service = {
     tree: {},
     fids: [],
     answer: function(p) {
+        // point the finger
+        //if (this.verbose) { throw new Error("hush!");}
         if (this.verbose) { console.log(p); }
         if (packets[p.type] !== undefined) {
             var handler = packets[p.type].name;
