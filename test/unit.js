@@ -1,5 +1,5 @@
 // some unit test functions
-var maybe = require('./maybe').maybe;
+var maybe = require('../maybe').maybe;
 
 module.exports.testcase = function(n){
   console.log(n ? "PASS" : "FAIL");

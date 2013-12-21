@@ -2,7 +2,7 @@ module.exports = function(grunt){
     grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     nodeunit: {
-      files: ['*_test.js']
+      files: ['test/*_test.js']
     },
     concat: {
       dist: {
@@ -15,7 +15,7 @@ module.exports = function(grunt){
        }
     },
     jshint: {
-        files: ['Gruntfile.js', '*.js'],
+        files: ['Gruntfile.js', '*.js', 'test/*.js'],
     },
     watch: {
         files: ['<%= jshint.files %>'],

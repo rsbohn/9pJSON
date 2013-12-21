@@ -1,7 +1,7 @@
 var unit = require("./unit"),
-	util = require("./ixputil"),
-	ixp = require("./ixp");
-	attach = require("./client").attach;
+	util = require("../ixputil"),
+	ixp = require("../ixp");
+	attach = require("../client").attach;
 
 ixp.set_util(util);
 
@@ -57,7 +57,7 @@ var fmt_dirent = [
 "i4:mode", "i4:atime", "i4:mtime", "i8:length", 
 "S2:name", "S2:uid", "S2:gid", "S2:muid"
 ];
-var util = require('./ixputil');
+//var util = require('./ixputil');
 var verbose = false;
 
 ixp.Service.send9p = function(p){return p;};

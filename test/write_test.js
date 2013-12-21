@@ -1,10 +1,9 @@
 var unit = require("./unit"),
-	client = require("./client"),
-	ixp = require("./index").ixp;
-
+	client = require("../client"),
+	ixp = require("../index").ixp,
+	maybe = require("../maybe").maybe;
 var OREAD=0, OWRITE=1, ORDWR=2, OEXEC=3;
 
-var maybe = require("./maybe").maybe;
 ixp.tree.mkfile("/temp",
 	undefined,
 	function(o,n){  return this.data.substr(o,n);},
