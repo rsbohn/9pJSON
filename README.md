@@ -17,9 +17,11 @@ function calls, "service.Tattach({...})" for example.
 
 Contributing
 Porting any of the following:
-- libdraw
-- auth (kinda essential)
-- factotum
-- secret store
+* libdraw (to HTML5 Canvas)
+* auth (kinda essential)
+* factotum
+* secret store
 
-To contribute just fork this repository
+To contribute please fork this repository, submit pull requests.
+
+Much of this code is based on https://github.com/aiju/jsdrawterm
