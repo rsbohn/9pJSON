@@ -1,4 +1,5 @@
-ixp.js
+9pJSON
+======
 
 A new Javascript implementation of the 9p protocol.
 Unlike most other implementations this one decouples the marshalling.
