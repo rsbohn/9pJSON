@@ -5,36 +5,6 @@ var unit = require("./unit"),
 
 ixp.set_util(util);
 
-console.log("ixp:");
-var root = ixp.mkroot();
-root.mkdir("/a").mkdir("b");
-root.mkdir("/a/a").mkdir("b");
-root.mkdir("/a/nother");
-root.mkdir("/cows");
-
-//lookup should return a directory
-unit.testcase(ixp.isDir(root.lookup("/a/a/b", false)));
-//child nodes should be able to lookup
-exports.lookup_nother = function(test){
-  var fixture = root.lookup('/a').lookup('nother');
-  test.equals(fixture.name, "nother", "lookup failure");
-  test.done();
-};
-//should throw an error if path is not found
-unit.testcase(unit.should_throw("/a/c not found", function(){
-    root.lookup("/a/c");
-}));
-
-//files
-exports.mkfile = function(test){
-  var k = {open: null, read: null, write: null, close: null};
-  var parent = root.lookup('/a/b', false);
-  var fixture = parent.mkfile("file0", k.open, k.read, k.write, k.close);
-  test.ok(ixp.isFile(fixture));
-  test.equals(fixture.name, "file0");
-  test.done();
-};
-
 console.log("protocol 9p:");
 console.log("should answer Tnonesuch with an error");
 ixp.Service.answer({type:99, tag: 1998});
@@ -45,6 +15,10 @@ ixp.Service.answer({type:100, tag: 1999, version: "tablespoon"});
 console.log("should answer Tauth with an error");
 ixp.Service.answer({type:ixp.Tauth, tag: 2000});
 
+var root = ixp.mkroot();
+root.mkdir("/a");
+root.mkdir("/cows");
+
 ixp.Service.tree = root;
 console.log("should allow first Tattach");
 ixp.Service.answer({type:ixp.Tattach, tag: 2000, fid: 1812});
@@ -52,12 +26,6 @@ ixp.Service.answer({type:ixp.Tattach, tag: 2000, fid: 1812});
 console.log("should fail second Tattach with same fid");
 ixp.Service.answer({type:ixp.Tattach, tag: 2000, fid: 1812});
 
-var fmt_dirent = [
-"i2:size", "i2:type", "i4:dev", "b13:qid", 
-"i4:mode", "i4:atime", "i4:mtime", "i8:length", 
-"S2:name", "S2:uid", "S2:gid", "S2:muid"
-];
-//var util = require('./ixputil');
 var verbose = false;
 
 ixp.Service.send9p = function(p){return p;};
