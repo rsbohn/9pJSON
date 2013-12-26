@@ -1,12 +1,12 @@
 {
-  "name": "ixp",
-  "version": "0.0.0",
+  "name": "9pJSON",
+  "version": "0.0.1",
   "description": "The 9p protocol.",
   "main": "index.js",
   "scripts": {
     "test": "node ixp_test.js"
   },
-  "repository": "",
+  "repository": "git://github.com/rsbohn/9pJSON",
   "author": "Randall Bohn",
   "license": "BSD",
   "gitHead": "acfd22deccaa64c758a78ebf718c851ddc45da00",
