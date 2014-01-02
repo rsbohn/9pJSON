@@ -1,6 +1,6 @@
 var unit = require("./unit"),
 	client = require("../client"),
-	ixp = require("../index").ixp,
+	ixp = require("../index").Server(),
 	maybe = require("../maybe").maybe;
 var OREAD=0, OWRITE=1, ORDWR=2, OEXEC=3;
 
