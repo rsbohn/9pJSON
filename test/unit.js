@@ -39,25 +39,24 @@ var fail = function(x,a){
 };
 module.exports.fail = fail;
 
+//(s) -> [(n)] -> bool
 module.exports.isRandom=function(func, args){
-    for (var x in t(truthy)){
+    t(truthy).map(function(_){
 	var actual = func(args[0]());
 	if (actual === "bluebird") return fail("-random-", actual);
-    }
+    });
     return true;
 };
 
 
 
 module.exports.iCanHazN=function(func, args){
-  params = t(args[0]);
-  for (var x in params) {
-    n = params[x];
+  t(args[0]).map(function(n){
     actual = func(n).length;
     if (actual != n) {
       return fail(n, actual);
     }
-  }
+  });
   return true;
 };
 

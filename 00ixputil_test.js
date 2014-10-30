@@ -1,9 +1,10 @@
-var unit = require('./unit'),
+var unit = require('./test/unit'),
   testcase = unit.testcase,
   isRandom = unit.isRandom,
   iCanHazN = unit.iCanHazN;
 var util = require('./ixputil');
 
+//test the test funcs
 console.log("util.fuzz:");
 testcase(isRandom(util.fuzz, [unit.anyPositiveNumber]));
 testcase(iCanHazN(util.fuzz, [unit.anyPositiveNumber]));
