@@ -1,7 +1,9 @@
 // cat ixputil.js ixp.js > ixp.all.js
 (function(exports){
 var util = {};
-exports.set_util = function(that){util=that;};
+exports.set_util = function(that){
+  util=that;
+};
 
 var QTDIR = 0x80;
 var Qid = ["i1:type", "i4:ver", "i8:path"];
@@ -83,7 +85,7 @@ exports.Service = {
         if (p.fid === undefined) return this.error9p(p.tag, "attach requires a fid");
         if (this.fids[p.fid] !== undefined) return this.error9p(p.tag, "fid already in use");
         this.fids[p.fid] = { f: this.tree, open: false};
-        return this.send9p({type: msgtype.Rattach, tag: p.tag, qid: util.pack(this.tree.qid, Qid)});
+        return this.send9p({type: msgtype.Rattach, tag: p.tag, qid: this.tree.qid});
     },
 
     Twalk: function(p){
@@ -112,7 +114,7 @@ exports.Service = {
           if (isDir(node.f)) { node.f.bloc = node.f.nloc = 0;}
           node.open=true;
          //console.log(node);
-          return this.send9p({type:msgtype.Ropen, tag:p.tag, qid: util.pack(node.f.qid, Qid), iounit:0});
+          return this.send9p({type:msgtype.Ropen, tag:p.tag, qid: node.f.qid, iounit:0});
         } else { 
             return this.error9p(p.tag, "permission denied: "+reason);
         }

@@ -1,5 +1,4 @@
-9pJSON
-======
+# 9pJSON
 
 A new Javascript implementation of the 9p protocol.
 Unlike most other implementations this one decouples the marshalling.
@@ -16,13 +15,35 @@ in ixp.js:packets[] and send it to service.answer(). You'll get a response packe
 (as a javascript object). Within your program you can make direct protocol 
 function calls, "service.Tattach({...})" for example.
 
-Contributing
+## Usage
+
+### Browser
+
+First run `grunt concat` to build 9pJSON.all.js, then include it in your .html file.
+See proto.html for more information.
+
+### Node.js
+
+Require 9pJSON, then call .Server() or .Client() as needed. Servers will build a file
+tree and then respond to requests by calling .answer(packet).
+
+## Contributing
+
 Porting any of the following:
 * libdraw (to HTML5 Canvas)
 * auth (kinda essential)
 * factotum
 * secret store
 
-To contribute please fork this repository, submit pull requests.
+To contribute please fork this repository, 
+make sure all the tests pass (including jshint),
+then submit pull requests. 
+Code aligned with the project direction 
+is more likely to be merged 
+into the master branch.
+Unlikely to be accepted: overly complex code,
+patches that change multiple features,
+patches without tests.
 
-Much of this code is based on https://github.com/aiju/jsdrawterm
+Much of this code is based on https://github.com/aiju/jsdrawterm. 
+Most of this code was developed using Acme and a 'test first (mostly)' process.
