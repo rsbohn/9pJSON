@@ -50,12 +50,12 @@ var pad = function(s, wide, fill) {
 };
 exports.pad = pad;
 
-exports.pack = function(data, spec){
+exports.pack = function(data, specs){
   var out = [];
-  for (var x in spec) {
-    var ss = spec[x].split(":");
+  specs.forEach(function(spec) {
+    var ss = spec.split(":");
     out.push(ipack(ss[0], data[ss[1]]));
-  }
+  });
   return out.join('');
 };
 
@@ -92,10 +92,10 @@ var iunpack = function(fmt, data){
   }
 };
 
-exports.unpack = function(data, spec){
+exports.unpack = function(data, specList){
   var out = {};
-  for (var x in spec) {
-    var ss = spec[x].split(":");
+  specList.forEach(function(spec) {
+    var ss = spec.split(":");
     var slot = ss[1];
     var wide = ss[0].substring(1);
     var value=iunpack(ss[0], data);
@@ -104,7 +104,7 @@ exports.unpack = function(data, spec){
       data = data.substring(value.length);
     }
     out[slot]=value;
-  }
+  });
   return out;
 };
 
