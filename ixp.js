@@ -201,7 +201,10 @@ exports.dirent = function(f){
   var now = new Date().getTime() / 1000;
   var s = { type: 0, dev: 0, qid: f.qid, mode: 0, atime: now, mtime: now, length: 1, 
     name: f.name, uid: "js", gid: "js", muid: "js"};
-  if(f.qid.type & QTDIR) { s.mode |= 0111; s.mode += 0x80000000; }
+  if (f.qid.type & QTDIR) {
+    s.mode |= 0o111;
+    s.mode += 0x80000000;
+  }
   return s;
 };
 
