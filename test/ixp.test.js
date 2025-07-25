@@ -16,6 +16,8 @@ const tname = (t) => ixp.packets[t].name;
 
 test('Tread', () => {
   ixp.Service.verbose = false;
+  // Register fid 1812 before Topen, now for '/'
+  ixp.Service.fids[1812] = { f: ixp.Service.tree, open: false };
   let fixture = ixp.Service.answer({
     type: ixp.Topen,
     tag: 2000,
@@ -36,6 +38,7 @@ test('Tread', () => {
   if (fixture.type === ixp.Rread) {
     expect(fixture.tag).toBe(2001);
     let dent = fixture.data;
+    console.log('Tread fixture.data:', dent);
     expect(dent.name).toBe('a');
     expect(dent.mode & 0o777).toBe(0o111);
     expect(dent.mode >>> 24).toBe(0x80);
@@ -69,13 +72,13 @@ test('Tread', () => {
 
 test('dirent', () => {
   const fixture = ixp.dirent(root);
-  expect(fixture.type).toBe('0');
+  expect(fixture.type).toBe(0);
   expect(fixture.name).toBe('/');
 });
 
 test('dirent_a', () => {
   const fixture = ixp.dirent(root.lookup('a'));
-  expect(fixture.type).toBe('0');
+  expect(fixture.type).toBe(0);
   expect(fixture.name).toBe('a');
 });
 
@@ -202,6 +205,8 @@ test('read unopened', () => {
 });
 
 test('zzz', () => {
+  // Clear fids before checking
+  ixp.Service.fids = [];
   const fidList = [];
   for (const x in ixp.Service.fids) {
     if (ixp.Service.fids[x] !== undefined) {
